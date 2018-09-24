@@ -26,6 +26,8 @@ import org.jetbrains.anko.uiThread
 import java.io.IOException
 import java.net.URL
 
+//https://www.raywenderlich.com/230-introduction-to-google-maps-api-for-android-with-kotlin
+
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     override fun onMarkerClick(p0: Marker?) = false
