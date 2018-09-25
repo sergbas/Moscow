@@ -36,15 +36,9 @@ build/
 /local.properties
 /.idea/workspace.xml
 .DS_Store
-app/src/main/dashboard@2x.png
-captures/
-install.sh
-plus@2x.png
 /gradle.properties
 location-tracker/
 locationtracker/
 projectFilesBackup/
-reports/
-app/Database1.sql
-
+google_maps_api.xml
 output.json

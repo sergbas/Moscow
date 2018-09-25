@@ -41,7 +41,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private var locationUpdateState = false
 
     var urlTelemetry = "https://api.mosgorpass.ru/v7/telemetry?bounds=55.773125631218136,37.60907378795798;55.758637899944006,37.623260320667214&exclude="
-    var urlWeather = "http://api.openweathermap.org/data/2.5/forecast/daily?APPID=15646a06818f61f7b8d7823ca833e1ce&q=Moscow,ru&mode=json&units=metric&cnt=7"
+    var urlWeather = "http://api.openweathermap.org/data/2.5/forecast/daily?APPID=15646a06818f61f7b8d7823ca833e1ce&lat=%f&lon=%f&mode=json&units=metric&cnt=7"
 
 
     companion object {
@@ -95,11 +95,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         doAsync {
             Request(urlTelemetry).run()
             uiThread { longToast("Telemetry") }
-        }
-
-        doAsync {
-            Request(urlWeather).run()
-            uiThread { longToast("Weather") }
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -171,6 +166,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 Log.d(javaClass.simpleName, "location-0:" + currentLatLng)
                 placeMarkerOnMap(currentLatLng)
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 14f))
+
+                doAsync {
+                    Request(java.lang.String.format(urlWeather, currentLatLng.latitude, currentLatLng.longitude)).run()
+                    uiThread { longToast("Weather") }
+                }
             }
         }
     }
@@ -190,6 +190,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     class Request(val url: String){
         fun run(){
+            Log.d(javaClass.simpleName, "Request: " + url)
             val jsonStr = URL(url).readText()
             Log.d(javaClass.simpleName, jsonStr)
         }
