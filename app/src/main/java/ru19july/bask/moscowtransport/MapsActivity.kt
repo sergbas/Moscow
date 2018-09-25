@@ -22,6 +22,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.gson.Gson
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.uiThread
@@ -43,6 +44,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     var urlTelemetry = "https://api.mosgorpass.ru/v7/telemetry?bounds=55.773125631218136,37.60907378795798;55.758637899944006,37.623260320667214&exclude="
     var urlWeather = "http://api.openweathermap.org/data/2.5/forecast/daily?APPID=15646a06818f61f7b8d7823ca833e1ce&lat=%f&lon=%f&mode=json&units=metric&cnt=7"
 
+    data class ForecastResult(val city: City, val list: List<Forecast>)
+
+    data class City(val id: Long, val name: String, val coord: Coordinates, val country: String, val population: Int)
+    data class Coordinates(val lon: Float, val lat: Float)
+    data class Forecast(val dt: Long, val temp: Temperature, val pressure: Float, val humidity: Int, val weather: List<Weather>, val speed: Float, val deg: Int, val clouds: Int, val rain: Float)
+    data class Temperature(val day: Float, val min: Float, val max: Float, val night: Float, val eve: Float, val morn: Float)
+    data class Weather(val id: Long, val main: String, val description: String, val icon: String)
 
     companion object {
         const val REQUEST_PERMISSION = 1
@@ -73,9 +81,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
             }
         }
-
         createLocationRequest()
-
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -94,7 +100,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         doAsync {
             Request(urlTelemetry).run()
-            uiThread { longToast("Telemetry") }
+            //uiThread { longToast("Telemetry") }
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -168,8 +174,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 14f))
 
                 doAsync {
-                    Request(java.lang.String.format(urlWeather, currentLatLng.latitude, currentLatLng.longitude)).run()
-                    uiThread { longToast("Weather") }
+                    var url = java.lang.String.format(urlWeather, currentLatLng.latitude, currentLatLng.longitude)
+                    val jsonStr = URL(url).readText()
+
+                    Log.d(javaClass.simpleName, "Weather: " + jsonStr)
+
+                    var forecast : ForecastResult = Gson().fromJson(jsonStr, ForecastResult::class.java)
+                    Log.d(javaClass.simpleName, "City: " + forecast.city.name + ", population:" + forecast.city.population)
+                    Log.d(javaClass.simpleName, "Day temp: " + forecast.list[0].temp.day)
+                    Log.d(javaClass.simpleName, "Weather: " + forecast.list[0].weather[0].main + " - " + forecast.list[0].weather[0].description)
+
+                    uiThread { longToast("Weather: " + forecast.list[0].temp.day + "; " + forecast.list[0].weather[0].main + " - " + forecast.list[0].weather[0].description) }
+
+                    Log.d(javaClass.simpleName, "WEATHER:" + forecast)
                 }
             }
         }
