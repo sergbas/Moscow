@@ -3,7 +3,9 @@ package ru19july.bask.moscowtransport
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.constants.Style
+import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 
 class MapBoxActivity : AppCompatActivity() {
@@ -20,6 +22,10 @@ class MapBoxActivity : AppCompatActivity() {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync({
             it.setStyle(Style.SATELLITE)
+
+            it.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                    LatLng(55.7507, 37.6177), 13.0));
+
             // Customize map with markers, polylines, etc.
         })
     }
