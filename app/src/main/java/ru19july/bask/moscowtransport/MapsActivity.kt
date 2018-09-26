@@ -17,7 +17,6 @@ import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
@@ -31,11 +30,9 @@ import java.net.URL
 
 //https://www.raywenderlich.com/230-introduction-to-google-maps-api-for-android-with-kotlin
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class MapsActivity : AppCompatActivity() {
 
-    override fun onMarkerClick(p0: Marker?) = false
-
-    private lateinit var mMap: GoogleMap
+    private lateinit var mMap: MyGoogleMap
     private lateinit var lastLocation: Location
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
