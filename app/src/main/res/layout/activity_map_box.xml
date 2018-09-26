@@ -10,8 +10,8 @@
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        mapbox:mapbox_cameraTargetLat="41.885"
-        mapbox:mapbox_cameraTargetLng="-87.679"
+        mapbox:mapbox_cameraTargetLat="55.7507"
+        mapbox:mapbox_cameraTargetLng="37.6177"
         mapbox:mapbox_styleUrl="@string/mapbox_style_satellite"
         mapbox:mapbox_cameraTilt="20"
         mapbox:mapbox_cameraZoom="12"/>
