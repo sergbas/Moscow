@@ -17,6 +17,7 @@ import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
@@ -30,9 +31,11 @@ import java.net.URL
 
 //https://www.raywenderlich.com/230-introduction-to-google-maps-api-for-android-with-kotlin
 
-class MapsActivity : AppCompatActivity() {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
-    private lateinit var mMap: MyGoogleMap
+    override fun onMarkerClick(p0: Marker?) = false
+
+    private lateinit var mMap: GoogleMap
     private lateinit var lastLocation: Location
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
@@ -171,12 +174,12 @@ class MapsActivity : AppCompatActivity() {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 14f))
 
                 doAsync {
-                    var url = java.lang.String.format(urlWeather, currentLatLng.latitude, currentLatLng.longitude)
+                    val url = java.lang.String.format(urlWeather, currentLatLng.latitude, currentLatLng.longitude)
                     val jsonStr = URL(url).readText()
 
                     Log.d(javaClass.simpleName, "Weather: " + jsonStr)
 
-                    var forecast : ForecastResult = Gson().fromJson(jsonStr, ForecastResult::class.java)
+                    val forecast : ForecastResult = Gson().fromJson(jsonStr, ForecastResult::class.java)
                     Log.d(javaClass.simpleName, "City: " + forecast.city.name + ", population:" + forecast.city.population)
                     Log.d(javaClass.simpleName, "Day temp: " + forecast.list[0].temp.day)
                     Log.d(javaClass.simpleName, "Weather: " + forecast.list[0].weather[0].main + " - " + forecast.list[0].weather[0].description)
