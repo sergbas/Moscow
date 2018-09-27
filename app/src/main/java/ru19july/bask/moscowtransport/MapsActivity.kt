@@ -1,6 +1,7 @@
 package ru19july.bask.moscowtransport
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
@@ -64,6 +65,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
+        checkPermissions()
+
+        doAsync {
+            Request(urlTelemetry).run()
+            //uiThread { longToast("Telemetry") }
+        }
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -84,23 +92,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         createLocationRequest()
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-
-        //val moscow = LatLng(55.45, 37.37)
-        //mMap.addMarker(MarkerOptions().position(moscow).title("Marker in Moscow"))
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(moscow, 12.0f))
-
-        setUpMap()
-
-        mMap.getUiSettings().setZoomControlsEnabled(true)
-        mMap.setOnMarkerClickListener(this)
-
-        //https://api.mosgorpass.ru/v7/stop?boundsFilter=55.77940526825614,37.61609095395988;55.77067642081403,37.624640337941855&perPage=500&page=0&disablePublicTransport=0
-
-        doAsync {
-            Request(urlTelemetry).run()
-            //uiThread { longToast("Telemetry") }
+    private fun checkPermissions() {
+        if (ActivityCompat.checkSelfPermission(this,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+            return
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -109,6 +106,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             Log.d(javaClass.simpleName, "WRITE")
             /// write()
         }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+
+        setUpMap()
+
+        mMap.getUiSettings().setZoomControlsEnabled(true)
+        mMap.setOnMarkerClickListener(this)
+
+        //https://api.mosgorpass.ru/v7/stop?boundsFilter=55.77940526825614,37.61609095395988;55.77067642081403,37.624640337941855&perPage=500&page=0&disablePublicTransport=0
+
     }
 
     private fun startLocationUpdates() {
@@ -154,14 +163,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun setUpMap() {
-        if (ActivityCompat.checkSelfPermission(this,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
-            return
-        }
-
         mMap.isMyLocationEnabled = true
 
         fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
