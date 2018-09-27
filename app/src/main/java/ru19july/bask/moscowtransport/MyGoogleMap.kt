@@ -2,24 +2,27 @@ package ru19july.bask.moscowtransport
 
 import android.annotation.SuppressLint
 import android.util.Log
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 
-class MyGoogleMap(mapFr: SupportMapFragment) : IMap, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class MyGoogleMap : IMap, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     override fun onMarkerClick(p0: Marker?) = false
 
     lateinit var googleMap: GoogleMap
-    private var mapFragment: SupportMapFragment
+    lateinit var mapView: MapView
+    lateinit var mapFragment: SupportMapFragment
 
-    init{
+    constructor(mapFr: SupportMapFragment){
         mapFragment = mapFr
         mapFragment.getMapAsync(this)
+    }
+
+    constructor(mapV: MapView){
+        mapView = mapV
+        mapView.getMapAsync(this)
     }
 
     private lateinit var mMap: GoogleMap

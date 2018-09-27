@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
+import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
@@ -26,10 +27,12 @@ import java.io.IOException
 import java.net.URL
 
 //https://www.raywenderlich.com/230-introduction-to-google-maps-api-for-android-with-kotlin
+//https://www.bignerdranch.com/blog/embedding-custom-views-with-mapview-v2/
 
 class MapsActivity : AppCompatActivity() {
 
     private lateinit var myMap: IMap//MyGoogleMap
+    private lateinit var mapView: MapView
     private lateinit var lastLocation: Location
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
@@ -58,6 +61,7 @@ class MapsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+        //setContentView(R.layout.activity_maps_view)
 
         checkPermissions()
 
@@ -80,13 +84,15 @@ class MapsActivity : AppCompatActivity() {
             }
         }
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
-
-
         myMap = MyGoogleMap(mapFragment)
 
+        /*
+            mapView = findViewById(R.id.mapview)
+            myMap = MyGoogleMap(mapView)
+*/
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
                 super.onLocationResult(p0)
