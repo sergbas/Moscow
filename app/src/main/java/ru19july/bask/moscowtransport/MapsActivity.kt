@@ -72,6 +72,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             //uiThread { longToast("Telemetry") }
         }
 
+        getWeather(LatLng(55.55, 37.77))
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -86,7 +88,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 lastLocation = p0.lastLocation
                 placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                 Log.d(javaClass.simpleName, "location-1:" + lastLocation)
-
             }
         }
         createLocationRequest()
@@ -108,10 +109,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        setUpMap()
+        mMap.isMyLocationEnabled = true
+
+        fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
+            // Got last known location. In some rare situations this can be null.
+            if (location != null) {
+                lastLocation = location
+                val currentLatLng = LatLng(location.latitude, location.longitude)
+                Log.d(javaClass.simpleName, "location-0:" + currentLatLng)
+                placeMarkerOnMap(currentLatLng)
+            }
+        }
 
         mMap.getUiSettings().setZoomControlsEnabled(true)
         mMap.setOnMarkerClickListener(this)
@@ -163,41 +175,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
     }
 
-    @SuppressLint("MissingPermission")
-    private fun setUpMap() {
-        mMap.isMyLocationEnabled = true
-
-        fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
-            // Got last known location. In some rare situations this can be null.
-            if (location != null) {
-                lastLocation = location
-                val currentLatLng = LatLng(location.latitude, location.longitude)
-                Log.d(javaClass.simpleName, "location-0:" + currentLatLng)
-                placeMarkerOnMap(currentLatLng)
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 14f))
-
-                doAsync {
-                    val url = java.lang.String.format(urlWeather, currentLatLng.latitude, currentLatLng.longitude)
-                    val jsonStr = URL(url).readText()
-
-                    Log.d(javaClass.simpleName, "Weather: " + jsonStr)
-
-                    val forecast : ForecastResult = Gson().fromJson(jsonStr, ForecastResult::class.java)
-                    Log.d(javaClass.simpleName, "City: " + forecast.city.name + ", population:" + forecast.city.population)
-                    Log.d(javaClass.simpleName, "Day temp: " + forecast.list[0].temp.day)
-                    Log.d(javaClass.simpleName, "Weather: " + forecast.list[0].weather[0].main + " - " + forecast.list[0].weather[0].description)
-
-                    uiThread { longToast("Weather: " + forecast.list[0].temp.day + "; " + forecast.list[0].weather[0].main + " - " + forecast.list[0].weather[0].description) }
-
-                    Log.d(javaClass.simpleName, "WEATHER:" + forecast)
-                }
-            }
-        }
-    }
-
     private fun placeMarkerOnMap(location: LatLng) {
         val markerOptions = MarkerOptions().position(location)
         mMap.addMarker(markerOptions)
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 14f))
+    }
+
+    private fun getWeather(currentLatLng: LatLng) {
+        doAsync {
+            val url = java.lang.String.format(urlWeather, currentLatLng.latitude, currentLatLng.longitude)
+            val jsonStr = URL(url).readText()
+
+            Log.d(javaClass.simpleName, "Weather: " + jsonStr)
+
+            val forecast : ForecastResult = Gson().fromJson(jsonStr, ForecastResult::class.java)
+            Log.d(javaClass.simpleName, "City: " + forecast.city.name + ", population:" + forecast.city.population)
+            Log.d(javaClass.simpleName, "Day temp: " + forecast.list[0].temp.day)
+            Log.d(javaClass.simpleName, "Weather: " + forecast.list[0].weather[0].main + " - " + forecast.list[0].weather[0].description)
+
+            uiThread { longToast("Weather: " + forecast.list[0].temp.day + "; " + forecast.list[0].weather[0].main + " - " + forecast.list[0].weather[0].description) }
+
+            Log.d(javaClass.simpleName, "WEATHER:" + forecast)
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -236,7 +235,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
         return addressText
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
