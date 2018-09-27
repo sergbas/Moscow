@@ -29,7 +29,7 @@ import java.net.URL
 
 class MapsActivity : AppCompatActivity() {
 
-    private lateinit var myMap: MyGoogleMap
+    private lateinit var myMap: IMap//MyGoogleMap
     private lateinit var lastLocation: Location
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest

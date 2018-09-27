@@ -10,7 +10,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 
-class MyGoogleMap(mapFr: SupportMapFragment) : OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class MyGoogleMap(mapFr: SupportMapFragment) : IMap, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     override fun onMarkerClick(p0: Marker?) = false
 
@@ -37,7 +37,7 @@ class MyGoogleMap(mapFr: SupportMapFragment) : OnMapReadyCallback, GoogleMap.OnM
 
     }
 
-    public fun placeMarkerOnMap(location: LatLng) {
+    override public fun placeMarkerOnMap(location: LatLng) {
         Log.d(javaClass.simpleName, "placeMarkerOnMap: " + location)
         val markerOptions = MarkerOptions().position(location)
         mMap.addMarker(markerOptions)
