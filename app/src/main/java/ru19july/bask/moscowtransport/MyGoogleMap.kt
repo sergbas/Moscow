@@ -21,20 +21,22 @@ class MyGoogleMap : IMap, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     }
 
     constructor(mapV: MapView){
+        Log.d(javaClass.simpleName, "mapView:" + mapV)
         mapView = mapV
         mapView.getMapAsync(this)
     }
 
-    private lateinit var mMap: GoogleMap
+    private var mMap: GoogleMap? = null
 
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        Log.d(javaClass.simpleName, "onMapReady, googleMap: " + googleMap)
 
-        mMap.isMyLocationEnabled = true
+        mMap?.isMyLocationEnabled = true
 
-        mMap.getUiSettings().setZoomControlsEnabled(true)
-        mMap.setOnMarkerClickListener(this)
+        mMap?.getUiSettings()?.setZoomControlsEnabled(true)
+        mMap?.setOnMarkerClickListener(this)
 
         //https://api.mosgorpass.ru/v7/stop?boundsFilter=55.77940526825614,37.61609095395988;55.77067642081403,37.624640337941855&perPage=500&page=0&disablePublicTransport=0
 
@@ -43,7 +45,7 @@ class MyGoogleMap : IMap, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     override public fun placeMarkerOnMap(location: LatLng) {
         Log.d(javaClass.simpleName, "placeMarkerOnMap: " + location)
         val markerOptions = MarkerOptions().position(location)
-        mMap.addMarker(markerOptions)
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 14f))
+        mMap?.addMarker(markerOptions)
+        mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 14f))
     }
 }

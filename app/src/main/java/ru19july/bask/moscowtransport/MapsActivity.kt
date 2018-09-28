@@ -16,6 +16,8 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -25,6 +27,8 @@ import org.jetbrains.anko.longToast
 import org.jetbrains.anko.uiThread
 import java.io.IOException
 import java.net.URL
+
+
 
 //https://www.raywenderlich.com/230-introduction-to-google-maps-api-for-android-with-kotlin
 //https://www.bignerdranch.com/blog/embedding-custom-views-with-mapview-v2/
@@ -55,14 +59,27 @@ class MapsActivity : AppCompatActivity() {
         private const val REQUEST_CHECK_SETTINGS = 3
     }
 
+    val mapType = 0//1 - MapView, 0 - MapFragment
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_maps)
-        //setContentView(R.layout.activity_maps_view)
+        if(mapType == 0)
+            setContentView(R.layout.activity_maps)
+        else {
+            setContentView(R.layout.activity_maps_view)
 
+            mapView = findViewById(R.id.mapview);
+            //mapView.onCreate(mapViewBundle);
+            mapView.getMapAsync(fun(googleMap: GoogleMap) {
+                gmap = googleMap
+                gmap!!.setMinZoomPreference(12F)
+                val ny = LatLng(40.7143528, -74.0059731)
+                gmap!!.moveCamera(CameraUpdateFactory.newLatLng(ny))
+            });
+        }
         checkPermissions()
 
         doAsync {
@@ -85,14 +102,15 @@ class MapsActivity : AppCompatActivity() {
         }
 
 
-        val mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
-        myMap = MyGoogleMap(mapFragment)
-
-        /*
+        if(mapType == 0) {
+            val mapFragment = supportFragmentManager .findFragmentById(R.id.map) as SupportMapFragment
+            myMap = MyGoogleMap(mapFragment)
+        }
+        else {
             mapView = findViewById(R.id.mapview)
-            myMap = MyGoogleMap(mapView)
-*/
+            //myMap = MyGoogleMap(mapView)
+        }
+
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
                 super.onLocationResult(p0)
@@ -104,6 +122,9 @@ class MapsActivity : AppCompatActivity() {
         }
         createLocationRequest()
     }
+
+    private var gmap: GoogleMap? = null
+
 
     private fun checkPermissions() {
         if (ActivityCompat.checkSelfPermission(this,
@@ -242,4 +263,6 @@ class MapsActivity : AppCompatActivity() {
             startLocationUpdates()
         }
     }
+
+
 }
