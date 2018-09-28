@@ -2,13 +2,21 @@ package ru19july.bask.moscowtransport
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.annotations.Marker
+import com.mapbox.mapboxsdk.annotations.MarkerOptions
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.constants.Style
+import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 
 class MapBoxActivity : AppCompatActivity() {
 
     private lateinit var mapView: MapView
+    private var destinationMarker: Marker? = null
+    private val originCoord: LatLng? = null
+    private var destinationCoord: LatLng? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,8 +27,19 @@ class MapBoxActivity : AppCompatActivity() {
         mapView = findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync({
+
+            Log.d(javaClass.simpleName, "----- MAP -----")
             it.setStyle(Style.SATELLITE)
+
+            destinationCoord = LatLng(55.7507, 37.6177)
+            it.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                    destinationCoord!!, 13.0));
+
             // Customize map with markers, polylines, etc.
+
+            destinationMarker = it.addMarker(MarkerOptions()
+                    .position(destinationCoord)
+            )
         })
     }
 

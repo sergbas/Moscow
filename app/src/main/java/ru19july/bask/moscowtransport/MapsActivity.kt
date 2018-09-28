@@ -1,6 +1,7 @@
 package ru19july.bask.moscowtransport
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
@@ -17,25 +18,25 @@ import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.gson.Gson
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.uiThread
 import java.io.IOException
 import java.net.URL
+import java.util.*
+
 
 //https://www.raywenderlich.com/230-introduction-to-google-maps-api-for-android-with-kotlin
+//https://www.bignerdranch.com/blog/embedding-custom-views-with-mapview-v2/
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class MapsActivity : AppCompatActivity() {
 
-    override fun onMarkerClick(p0: Marker?) = false
-
-    private lateinit var mMap: GoogleMap
+    private lateinit var myMap: IMap//MyGoogleMap
+    private lateinit var mapView: MapView
     private lateinit var lastLocation: Location
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
@@ -58,49 +59,92 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         private const val REQUEST_CHECK_SETTINGS = 3
     }
 
+    val mapType = 0//1 - MapView, 0 - MapFragment
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_maps)
+        if(mapType == 0)
+            setContentView(R.layout.activity_maps)
+        else {
+            setContentView(R.layout.activity_maps_view)
+
+            mapView = findViewById(R.id.mapview);
+            //mapView.onCreate(mapViewBundle);
+            mapView.getMapAsync(fun(googleMap: GoogleMap) {
+                gmap = googleMap
+                gmap!!.setMinZoomPreference(12F)
+                val ny = LatLng(40.7143528, -74.0059731)
+                gmap!!.moveCamera(CameraUpdateFactory.newLatLng(ny))
+            });
+        }
+        checkPermissions()
+
+        doAsync {
+            Request(urlTelemetry).run()
+            //uiThread { longToast("Telemetry") }
+        }
+
+        getWeather(LatLng(55.55, 37.77))
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
+            // Got last known location. In some rare situations this can be null.
+            if (location != null) {
+                lastLocation = location
+
+                val currentLatLng = LatLng(location.latitude, location.longitude)
+                newPath(currentLatLng)
+                Log.d(javaClass.simpleName, "location-0:" + currentLatLng)
+                myMap!!.placeMarkerOnMap(currentLatLng)
+            }
+        }
+
+
+        if(mapType == 0) {
+            val mapFragment = supportFragmentManager .findFragmentById(R.id.map) as SupportMapFragment
+            myMap = MyGoogleMap(mapFragment)
+        }
+        else {
+            mapView = findViewById(R.id.mapview)
+            //myMap = MyGoogleMap(mapView)
+        }
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(p0: LocationResult) {
                 super.onLocationResult(p0)
 
                 lastLocation = p0.lastLocation
-                placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
+                newPath(LatLng(lastLocation.latitude, lastLocation.longitude))
+                myMap!!.placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                 Log.d(javaClass.simpleName, "location-1:" + lastLocation)
-
             }
         }
         createLocationRequest()
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
+    private fun newPath(location: LatLng) {
+        val r = Random()
+        val jsonPAth = Utils.makeURL(
+                location.latitude,
+                location.longitude,
+                location.latitude + r.nextDouble() * 0.01 - 0.005,
+                location.longitude + r.nextDouble() * 0.01 - 0.005)
+        Log.d(javaClass.simpleName, "newPath: " + jsonPAth)
+    }
 
-        //val moscow = LatLng(55.45, 37.37)
-        //mMap.addMarker(MarkerOptions().position(moscow).title("Marker in Moscow"))
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(moscow, 12.0f))
+    private var gmap: GoogleMap? = null
 
-        setUpMap()
 
-        mMap.getUiSettings().setZoomControlsEnabled(true)
-        mMap.setOnMarkerClickListener(this)
-
-        //https://api.mosgorpass.ru/v7/stop?boundsFilter=55.77940526825614,37.61609095395988;55.77067642081403,37.624640337941855&perPage=500&page=0&disablePublicTransport=0
-
-        doAsync {
-            Request(urlTelemetry).run()
-            //uiThread { longToast("Telemetry") }
+    private fun checkPermissions() {
+        if (ActivityCompat.checkSelfPermission(this,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+            return
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -110,6 +154,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             /// write()
         }
     }
+
 
     private fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this,
@@ -154,47 +199,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
     }
 
-    private fun setUpMap() {
-        if (ActivityCompat.checkSelfPermission(this,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
-            return
+    private fun getWeather(currentLatLng: LatLng) {
+        doAsync {
+            val url = java.lang.String.format(urlWeather, currentLatLng.latitude, currentLatLng.longitude)
+            val jsonStr = URL(url).readText()
+
+            Log.d(javaClass.simpleName, "Weather: " + jsonStr)
+
+            val forecast : ForecastResult = Gson().fromJson(jsonStr, ForecastResult::class.java)
+            Log.d(javaClass.simpleName, "City: " + forecast.city.name + ", population:" + forecast.city.population)
+            Log.d(javaClass.simpleName, "Day temp: " + forecast.list[0].temp.day)
+            Log.d(javaClass.simpleName, "Weather: " + forecast.list[0].weather[0].main + " - " + forecast.list[0].weather[0].description)
+
+            uiThread { longToast("Weather: " + forecast.list[0].temp.day + "; " + forecast.list[0].weather[0].main + " - " + forecast.list[0].weather[0].description) }
+
+            Log.d(javaClass.simpleName, "WEATHER:" + forecast)
         }
-
-        mMap.isMyLocationEnabled = true
-
-        fusedLocationClient.lastLocation.addOnSuccessListener(this) { location ->
-            // Got last known location. In some rare situations this can be null.
-            if (location != null) {
-                lastLocation = location
-                val currentLatLng = LatLng(location.latitude, location.longitude)
-                Log.d(javaClass.simpleName, "location-0:" + currentLatLng)
-                placeMarkerOnMap(currentLatLng)
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 14f))
-
-                doAsync {
-                    var url = java.lang.String.format(urlWeather, currentLatLng.latitude, currentLatLng.longitude)
-                    val jsonStr = URL(url).readText()
-
-                    Log.d(javaClass.simpleName, "Weather: " + jsonStr)
-
-                    var forecast : ForecastResult = Gson().fromJson(jsonStr, ForecastResult::class.java)
-                    Log.d(javaClass.simpleName, "City: " + forecast.city.name + ", population:" + forecast.city.population)
-                    Log.d(javaClass.simpleName, "Day temp: " + forecast.list[0].temp.day)
-                    Log.d(javaClass.simpleName, "Weather: " + forecast.list[0].weather[0].main + " - " + forecast.list[0].weather[0].description)
-
-                    uiThread { longToast("Weather: " + forecast.list[0].temp.day + "; " + forecast.list[0].weather[0].main + " - " + forecast.list[0].weather[0].description) }
-
-                    Log.d(javaClass.simpleName, "WEATHER:" + forecast)
-                }
-            }
-        }
-    }
-
-    private fun placeMarkerOnMap(location: LatLng) {
-        val markerOptions = MarkerOptions().position(location)
-        mMap.addMarker(markerOptions)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -234,7 +254,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         return addressText
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CHECK_SETTINGS) {
@@ -257,4 +276,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             startLocationUpdates()
         }
     }
+
+
+
 }

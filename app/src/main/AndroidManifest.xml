@@ -49,7 +49,10 @@
             </intent-filter>
 
         </activity>
+
         <activity android:name=".MapBoxActivity">
+
+
 
         </activity>
         <activity android:name=".SelectActivity"></activity>
