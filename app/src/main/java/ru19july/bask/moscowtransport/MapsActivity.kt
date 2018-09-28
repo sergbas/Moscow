@@ -27,7 +27,7 @@ import org.jetbrains.anko.longToast
 import org.jetbrains.anko.uiThread
 import java.io.IOException
 import java.net.URL
-
+import java.util.*
 
 
 //https://www.raywenderlich.com/230-introduction-to-google-maps-api-for-android-with-kotlin
@@ -95,7 +95,9 @@ class MapsActivity : AppCompatActivity() {
             // Got last known location. In some rare situations this can be null.
             if (location != null) {
                 lastLocation = location
+
                 val currentLatLng = LatLng(location.latitude, location.longitude)
+                newPath(currentLatLng)
                 Log.d(javaClass.simpleName, "location-0:" + currentLatLng)
                 myMap!!.placeMarkerOnMap(currentLatLng)
             }
@@ -116,11 +118,22 @@ class MapsActivity : AppCompatActivity() {
                 super.onLocationResult(p0)
 
                 lastLocation = p0.lastLocation
+                newPath(LatLng(lastLocation.latitude, lastLocation.longitude))
                 myMap!!.placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                 Log.d(javaClass.simpleName, "location-1:" + lastLocation)
             }
         }
         createLocationRequest()
+    }
+
+    private fun newPath(location: LatLng) {
+        val r = Random()
+        val jsonPAth = Utils.makeURL(
+                location.latitude,
+                location.longitude,
+                location.latitude + r.nextDouble() * 0.01 - 0.005,
+                location.longitude + r.nextDouble() * 0.01 - 0.005)
+        Log.d(javaClass.simpleName, "newPath: " + jsonPAth)
     }
 
     private var gmap: GoogleMap? = null
@@ -263,6 +276,7 @@ class MapsActivity : AppCompatActivity() {
             startLocationUpdates()
         }
     }
+
 
 
 }
