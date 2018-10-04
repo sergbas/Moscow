@@ -15,8 +15,11 @@ class MapViewActivity : AppCompatActivity() {
 
         var layout = findViewById<View>(R.id.layout_mapview) as LinearLayout
 
-        map = MapboxView(applicationContext, getString(R.string.app_access_token), this)
-        //map = YandexmapView(this, "")
+        var time = System.currentTimeMillis().toInt();
+        if(time % 2 == 0)
+            map = MapboxView(applicationContext, getString(R.string.app_access_token), this)
+        else
+            map = YandexmapView(this, "")
 
         layout.addView(map?.getView())
 
