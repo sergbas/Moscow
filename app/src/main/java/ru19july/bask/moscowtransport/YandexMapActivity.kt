@@ -10,8 +10,6 @@ import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.mapview.MapView
 
 
-
-
 class YandexMapActivity : AppCompatActivity() {
 
     private var mapview: MapView? = null
@@ -25,7 +23,7 @@ class YandexMapActivity : AppCompatActivity() {
         setContentView(R.layout.activity_yandex_map)
 
 
-        mapview = (findViewById<View>(R.id.mapview) as MapView)
+        mapview = (findViewById<View>(R.id.map) as MapView)
         mapview?.getMap()?.move(
                 CameraPosition(Point(55.751574, 37.573856), 11.0f, 0.0f, 0.0f),
                 Animation(Animation.Type.SMOOTH, 0F),

@@ -3,8 +3,9 @@
     android:layout_width="fill_parent" android:layout_height="fill_parent"
     android:orientation="vertical">
 
-    <ru.yandex.yandexmapkit.MapView
+    <com.yandex.mapkit.mapview.MapView
         android:id="@+id/map"
+        android:apiKey="56f599ed-8d55-449e-b970-bb72f3acef84"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:tag="static"
