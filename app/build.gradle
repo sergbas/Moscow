@@ -7,6 +7,9 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 28
     defaultConfig {
+        ndk {
+            abiFilters("armeabi-v7a", "x86")
+        }
         applicationId "ru19july.bask.moscowtransport"
         minSdkVersion 15
         targetSdkVersion 28
@@ -50,4 +53,6 @@ dependencies {
     //MapBox
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:5.3.2'
 
+    //Yandex Map
+    implementation 'com.yandex.android:mapkit:3.0.0'
 }

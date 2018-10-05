@@ -10,6 +10,7 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.os.StrictMode
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
@@ -46,12 +47,14 @@ class MapsActivity : AppCompatActivity() {
     var urlWeather = "http://api.openweathermap.org/data/2.5/forecast/daily?APPID=15646a06818f61f7b8d7823ca833e1ce&lat=%f&lon=%f&mode=json&units=metric&cnt=7"
 
     data class ForecastResult(val city: City, val list: List<Forecast>)
-
     data class City(val id: Long, val name: String, val coord: Coordinates, val country: String, val population: Int)
     data class Coordinates(val lon: Float, val lat: Float)
     data class Forecast(val dt: Long, val temp: Temperature, val pressure: Float, val humidity: Int, val weather: List<Weather>, val speed: Float, val deg: Int, val clouds: Int, val rain: Float)
     data class Temperature(val day: Float, val min: Float, val max: Float, val night: Float, val eve: Float, val morn: Float)
     data class Weather(val id: Long, val main: String, val description: String, val icon: String)
+
+    data class PathResult(val routes: List<Routes>)
+    data class Routes(val lon: Float, val lat: Float)
 
     companion object {
         const val REQUEST_PERMISSION = 1
@@ -66,6 +69,10 @@ class MapsActivity : AppCompatActivity() {
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val policy : StrictMode.ThreadPolicy = StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         if(mapType == 0)
             setContentView(R.layout.activity_maps)
         else {
@@ -118,7 +125,10 @@ class MapsActivity : AppCompatActivity() {
                 super.onLocationResult(p0)
 
                 lastLocation = p0.lastLocation
-                newPath(LatLng(lastLocation.latitude, lastLocation.longitude))
+
+                if(false)
+                    newPath(LatLng(lastLocation.latitude, lastLocation.longitude))
+
                 myMap!!.placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                 Log.d(javaClass.simpleName, "location-1:" + lastLocation)
             }
@@ -128,12 +138,143 @@ class MapsActivity : AppCompatActivity() {
 
     private fun newPath(location: LatLng) {
         val r = Random()
-        val jsonPAth = Utils.makeURL(
+        val pathUrl = Utils.makeURL(
                 location.latitude,
                 location.longitude,
                 location.latitude + r.nextDouble() * 0.01 - 0.005,
                 location.longitude + r.nextDouble() * 0.01 - 0.005)
-        Log.d(javaClass.simpleName, "newPath: " + jsonPAth)
+
+        Log.d(javaClass.simpleName, "newPath: " + pathUrl)
+
+        try {
+            val jsonStr = URL(pathUrl).readText()
+            Log.d(javaClass.simpleName, "PATH: " + jsonStr)
+
+            val path: PathResult = Gson().fromJson(jsonStr, PathResult::class.java)
+        }
+        catch (e: Exception){
+
+        }
+        /*
+        https://maps.googleapis.com/maps/api/directions/json?origin=55.7217987,37.6386096&destination=55.7209966399032,37.63444882356039&sensor=false&mode=walking&alternatives=true&key=AIzaSyDExP61EUO8OWdW3vpE0xJaCJjyOo50E-A
+        * {
+   "geocoded_waypoints" : [
+      {
+         "geocoder_status" : "OK",
+         "place_id" : "ChIJB3Vf4aRKtUYRV709NWFQFKE",
+         "types" : [ "establishment", "finance", "point_of_interest" ]
+      },
+      {
+         "geocoder_status" : "OK",
+         "place_id" : "ChIJZWtPFz1LtUYR0zonNZ53tDo",
+         "types" : [
+            "establishment",
+            "light_rail_station",
+            "point_of_interest",
+            "transit_station"
+         ]
+      }
+   ],
+   "routes" : [
+      {
+         "bounds" : {
+            "northeast" : {
+               "lat" : 55.7226516,
+               "lng" : 37.638289
+            },
+            "southwest" : {
+               "lat" : 55.7208869,
+               "lng" : 37.6352452
+            }
+         },
+         "copyrights" : "Картографические данные © 2018 Google",
+         "legs" : [
+            {
+               "distance" : {
+                  "text" : "0,4 км",
+                  "value" : 365
+               },
+               "duration" : {
+                  "text" : "4 мин.",
+                  "value" : 269
+               },
+               "end_address" : "Дубининская ул., 57, Москва, Россия, 115054",
+               "end_location" : {
+                  "lat" : 55.7208869,
+                  "lng" : 37.6352452
+               },
+               "start_address" : "Дубининская ул., 53 стр. 5, Москва, Россия, 115054",
+               "start_location" : {
+                  "lat" : 55.7220632,
+                  "lng" : 37.638289
+               },
+               "steps" : [
+                  {
+                     "distance" : {
+                        "text" : "0,2 км",
+                        "value" : 158
+                     },
+                     "duration" : {
+                        "text" : "2 мин.",
+                        "value" : 117
+                     },
+                     "end_location" : {
+                        "lat" : 55.7226516,
+                        "lng" : 37.6360382
+                     },
+                     "html_instructions" : "Следуйте на \u003cb\u003eзапад\u003c/b\u003e в сторону \u003cb\u003eул. Дубининская\u003c/b\u003e\u003cdiv style=\"font-size:0.9em\"\u003eДорога с ограниченным доступом\u003c/div\u003e",
+                     "polyline" : {
+                        "points" : "{ebsIifvdFUxB?BABABA@[X?@A?WtC?B?@ABA@Qb@?@A@?@Ix@AV"
+                     },
+                     "start_location" : {
+                        "lat" : 55.7220632,
+                        "lng" : 37.638289
+                     },
+                     "travel_mode" : "WALKING"
+                  },
+                  {
+                     "distance" : {
+                        "text" : "0,2 км",
+                        "value" : 207
+                     },
+                     "duration" : {
+                        "text" : "3 мин.",
+                        "value" : 152
+                     },
+                     "end_location" : {
+                        "lat" : 55.7208869,
+                        "lng" : 37.6352452
+                     },
+                     "html_instructions" : "Поверните \u003cb\u003eналево\u003c/b\u003e на \u003cb\u003eул. Дубининская\u003c/b\u003e\u003cdiv style=\"font-size:0.9em\"\u003eПункт назначения будет справа\u003c/div\u003e",
+                     "maneuver" : "turn-left",
+                     "polyline" : {
+                        "points" : "qibsIgxudFr@TRDLD\\NLDv@ZvAf@PFz@X"
+                     },
+                     "start_location" : {
+                        "lat" : 55.7226516,
+                        "lng" : 37.6360382
+                     },
+                     "travel_mode" : "WALKING"
+                  }
+               ],
+               "traffic_speed_entry" : [],
+               "via_waypoint" : []
+            }
+         ],
+         "overview_polyline" : {
+            "points" : "{ebsIifvdFYdC]\\YzCUj@MtArBp@nDpAz@X"
+         },
+         "summary" : "ул. Дубининская",
+         "warnings" : [
+            "Пешие маршруты находятся в режиме бета-тестирования. – Внимание! На предлагаемом маршруте могут отсутствовать тротуары или пешеходные дорожки."
+         ],
+         "waypoint_order" : []
+      }
+   ],
+   "status" : "OK"
+}
+        * */
+
     }
 
     private var gmap: GoogleMap? = null

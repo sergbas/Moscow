@@ -65,7 +65,10 @@ object Utils {
         urlString.append(",")
         urlString.append(java.lang.Double.toString(destlog))
         urlString.append("&sensor=false&mode=walking&alternatives=true")
-        urlString.append("&key=AIzaSyA_QY5Hyxg2hif-W-IDpupTUw0yrxjAeC4")
+        //urlString.append("&key=AIzaSyA_QY5Hyxg2hif-W-IDpupTUw0yrxjAeC4")
+        //urlString.append("&key=AIzaSyBtyeSPfTMfHA-IzHU_qdoCI8aFj_vlnDs")
+        urlString.append("&key=AIzaSyDExP61EUO8OWdW3vpE0xJaCJjyOo50E-A")
+
         return urlString.toString()
     }
 
