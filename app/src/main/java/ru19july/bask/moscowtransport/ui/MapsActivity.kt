@@ -110,7 +110,7 @@ class MapsActivity : AppCompatActivity() {
                 val currentLatLng = LatLng(location.latitude, location.longitude)
                 newPath(currentLatLng)
                 Log.d(javaClass.simpleName, "location-0:" + currentLatLng)
-                myMap!!.placeMarkerOnMap(currentLatLng)
+                myMap.placeMarkerOnMap(currentLatLng)
             }
         }
 
@@ -133,7 +133,7 @@ class MapsActivity : AppCompatActivity() {
                 if(false)
                     newPath(LatLng(lastLocation.latitude, lastLocation.longitude))
 
-                myMap!!.placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
+                myMap.placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                 Log.d(javaClass.simpleName, "location-1:" + lastLocation)
             }
         }

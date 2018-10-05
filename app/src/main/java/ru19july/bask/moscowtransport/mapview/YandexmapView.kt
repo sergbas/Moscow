@@ -21,7 +21,7 @@ class YandexmapView(context: Context, accessKey: String) : View(context), IMapVi
     }
 
     override fun onStart() {
-        mapview?.onStart()
+        mapview.onStart()
         MapKitFactory.getInstance().onStart()
     }
 
@@ -34,7 +34,7 @@ class YandexmapView(context: Context, accessKey: String) : View(context), IMapVi
     }
 
     override fun onStop() {
-        mapview?.onStop()
+        mapview.onStop()
         MapKitFactory.getInstance().onStop()
     }
 
@@ -51,7 +51,7 @@ class YandexmapView(context: Context, accessKey: String) : View(context), IMapVi
     }
 
     override fun moveTo(latitude: Double, longitude: Double, zoom: Double) {
-        mapview?.getMap()?.move(
+        mapview.getMap()?.move(
                 CameraPosition(Point(latitude, longitude), zoom.toFloat(), 0.0f, 0.0f),
                 Animation(Animation.Type.SMOOTH, 3F),
                 null)

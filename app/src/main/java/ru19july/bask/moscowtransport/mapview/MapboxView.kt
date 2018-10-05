@@ -65,7 +65,7 @@ class MapboxView(applicationContext: Context, app_access_token: String, context:
 
             val destinationCoord = LatLng(latitude, longitude)
             it.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                    destinationCoord!!, zoom));
+                    destinationCoord, zoom));
         })
     }
 }
