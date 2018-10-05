@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">MoscowTransport</string>
     <string name="title_activity_maps">MoscowTransport</string>
-    <string name="app_access_token">pk.eyJ1IjoiY3JvbGlxdWUiLCJhIjoiY2pqeHp2d2Q4MTUxbjNxbWtuNzI2MHUwOCJ9.1aUpdlaFC_f_DHsZxMPxoQ</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoiY3JvbGlxdWUiLCJhIjoiY2pqeHp2d2Q4MTUxbjNxbWtuNzI2MHUwOCJ9.1aUpdlaFC_f_DHsZxMPxoQ</string>
+    <string name="yandex_access_token">56f599ed-8d55-449e-b970-bb72f3acef84</string>
 </resources>

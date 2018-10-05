@@ -1,7 +1,8 @@
-package ru19july.bask.moscowtransport
+package ru19july.bask.moscowtransport.ui.activities
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import ru19july.bask.moscowtransport.R
 
 class SelectActivity : AppCompatActivity() {
 

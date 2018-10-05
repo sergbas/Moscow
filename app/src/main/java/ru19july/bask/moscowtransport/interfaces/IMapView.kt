@@ -1,4 +1,4 @@
-package ru19july.bask.moscowtransport
+package ru19july.bask.moscowtransport.interfaces
 
 import android.os.Bundle
 import android.view.View
@@ -11,6 +11,6 @@ interface IMapView {
     fun onDestroy()
     fun onLowMemory()
     fun onSaveInstanceState(outState: Bundle)
-    fun moveTo(latitude : Double, longitude: Double)
+    fun moveTo(latitude : Double, longitude: Double, zoom: Double)
     fun getView(): View?
 }

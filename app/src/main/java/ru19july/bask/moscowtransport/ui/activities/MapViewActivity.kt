@@ -1,9 +1,13 @@
-package ru19july.bask.moscowtransport
+package ru19july.bask.moscowtransport.ui.activities
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.LinearLayout
+import ru19july.bask.moscowtransport.R
+import ru19july.bask.moscowtransport.interfaces.IMapView
+import ru19july.bask.moscowtransport.mapview.MapboxView
+import ru19july.bask.moscowtransport.mapview.YandexmapView
 
 class MapViewActivity : AppCompatActivity() {
 
@@ -17,13 +21,13 @@ class MapViewActivity : AppCompatActivity() {
 
         var time = System.currentTimeMillis().toInt();
         if(time % 2 == 0)
-            map = MapboxView(applicationContext, getString(R.string.app_access_token), this)
+            map = MapboxView(applicationContext, getString(R.string.mapbox_access_token), this)
         else
-            map = YandexmapView(this, "")
+            map = YandexmapView(this, getString(R.string.yandex_access_token))
 
         layout.addView(map?.getView())
 
-        map?.moveTo(55.7507, 37.6177)
+        map?.moveTo(55.7507, 37.6177, 13.0)
     }
 
     override fun onStop() {

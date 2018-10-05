@@ -1,4 +1,4 @@
-package ru19july.bask.moscowtransport
+package ru19july.bask.moscowtransport.mapview
 
 import android.content.Context
 import android.os.Bundle
@@ -8,12 +8,13 @@ import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.mapview.MapView
+import ru19july.bask.moscowtransport.interfaces.IMapView
 
 class YandexmapView(context: Context, accessKey: String) : View(context), IMapView {
     private var mapview: MapView
 
     init {
-        MapKitFactory.setApiKey("56f599ed-8d55-449e-b970-bb72f3acef84")
+        MapKitFactory.setApiKey(accessKey)
         MapKitFactory.initialize(context)
 
         mapview = MapView(context)
@@ -49,9 +50,9 @@ class YandexmapView(context: Context, accessKey: String) : View(context), IMapVi
 
     }
 
-    override fun moveTo(latitude: Double, longitude: Double) {
+    override fun moveTo(latitude: Double, longitude: Double, zoom: Double) {
         mapview?.getMap()?.move(
-                CameraPosition(Point(latitude, longitude), 12.0f, 0.0f, 0.0f),
+                CameraPosition(Point(latitude, longitude), zoom.toFloat(), 0.0f, 0.0f),
                 Animation(Animation.Type.SMOOTH, 3F),
                 null)
     }
