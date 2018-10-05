@@ -160,6 +160,9 @@ class MapsActivity : AppCompatActivity() {
 
         }
         /*
+        https://api.mosgorpass.ru/v7/router?startPoint=55.72324587153767,37.62440166085253&finishPoint=55.73535364653236,37.63776631852102&osmStart=55.7231135,37.6239025&osmFinish=55.7352111,37.6376686
+        https://api.mosgorpass.ru/v7/address/geocoder?point=55.75768725286383,37.62605277555781
+
         https://maps.googleapis.com/maps/api/directions/json?origin=55.7217987,37.6386096&destination=55.7209966399032,37.63444882356039&sensor=false&mode=walking&alternatives=true&key=AIzaSyDExP61EUO8OWdW3vpE0xJaCJjyOo50E-A
         * {
    "geocoded_waypoints" : [
