@@ -13,7 +13,7 @@ class MyGoogleMap : IMap, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     override fun onMarkerClick(p0: Marker?) = false
 
     lateinit var googleMap: GoogleMap
-    lateinit var mapView: MapView
+    var mapView: MapView? = null
     lateinit var mapFragment: SupportMapFragment
 
     constructor(mapFr: SupportMapFragment){
@@ -24,7 +24,7 @@ class MyGoogleMap : IMap, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     constructor(mapV: MapView){
         Log.d(javaClass.simpleName, "mapView:" + mapV)
         mapView = mapV
-        mapView.getMapAsync(this)
+        mapView?.getMapAsync(this)
     }
 
     private var mMap: GoogleMap? = null

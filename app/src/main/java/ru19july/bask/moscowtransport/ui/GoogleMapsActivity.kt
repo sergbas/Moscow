@@ -28,7 +28,6 @@ import org.jetbrains.anko.longToast
 import org.jetbrains.anko.uiThread
 import ru19july.bask.moscowtransport.MyGoogleMap
 import ru19july.bask.moscowtransport.R
-import ru19july.bask.moscowtransport.interfaces.IMap
 import ru19july.bask.moscowtransport.utils.Utils
 import java.io.IOException
 import java.net.URL
@@ -38,10 +37,11 @@ import java.util.*
 //https://www.raywenderlich.com/230-introduction-to-google-maps-api-for-android-with-kotlin
 //https://www.bignerdranch.com/blog/embedding-custom-views-with-mapview-v2/
 
-class MapsActivity : AppCompatActivity() {
+class GoogleMapsActivity : AppCompatActivity() {
 
-    private lateinit var myMap: IMap//MyGoogleMap
-    private lateinit var mapView: MapView
+    private var myMap: MyGoogleMap? = null//
+    //private var gmap: GoogleMap? = null
+    private var mapView: MapView? = null
     private lateinit var lastLocation: Location
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationRequest: LocationRequest
@@ -66,7 +66,7 @@ class MapsActivity : AppCompatActivity() {
         private const val REQUEST_CHECK_SETTINGS = 3
     }
 
-    val mapType = 0//1 - MapView, 0 - MapFragment
+    val mapType = 1//0 - MapFragment, 1 - MapView
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -78,17 +78,17 @@ class MapsActivity : AppCompatActivity() {
         StrictMode.setThreadPolicy(policy);
 
         if(mapType == 0)
-            setContentView(R.layout.activity_maps)
+            setContentView(R.layout.fragment_googlemaps)
         else {
-            setContentView(R.layout.activity_maps_view)
+            setContentView(R.layout.activity_googlemaps)
 
             mapView = findViewById(R.id.mapview);
             //mapView.onCreate(mapViewBundle);
-            mapView.getMapAsync(fun(googleMap: GoogleMap) {
-                gmap = googleMap
-                gmap!!.setMinZoomPreference(12F)
+            mapView?.getMapAsync(fun(googleMap: GoogleMap) {
+                myMap?.googleMap = googleMap
+                myMap?.googleMap?.setMinZoomPreference(12F)
                 val ny = LatLng(40.7143528, -74.0059731)
-                gmap!!.moveCamera(CameraUpdateFactory.newLatLng(ny))
+                myMap?.googleMap?.moveCamera(CameraUpdateFactory.newLatLng(ny))
             });
         }
         checkPermissions()
@@ -110,10 +110,9 @@ class MapsActivity : AppCompatActivity() {
                 val currentLatLng = LatLng(location.latitude, location.longitude)
                 newPath(currentLatLng)
                 Log.d(javaClass.simpleName, "location-0:" + currentLatLng)
-                myMap.placeMarkerOnMap(currentLatLng)
+                myMap?.placeMarkerOnMap(currentLatLng)
             }
         }
-
 
         if(mapType == 0) {
             val mapFragment = supportFragmentManager .findFragmentById(R.id.map) as SupportMapFragment
@@ -121,7 +120,7 @@ class MapsActivity : AppCompatActivity() {
         }
         else {
             mapView = findViewById(R.id.mapview)
-            //myMap = MyGoogleMap(mapView)
+            myMap = MyGoogleMap(mapView!!)
         }
 
         locationCallback = object : LocationCallback() {
@@ -133,7 +132,7 @@ class MapsActivity : AppCompatActivity() {
                 if(false)
                     newPath(LatLng(lastLocation.latitude, lastLocation.longitude))
 
-                myMap.placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
+                myMap?.placeMarkerOnMap(LatLng(lastLocation.latitude, lastLocation.longitude))
                 Log.d(javaClass.simpleName, "location-1:" + lastLocation)
             }
         }
@@ -284,9 +283,6 @@ class MapsActivity : AppCompatActivity() {
 
     }
 
-    private var gmap: GoogleMap? = null
-
-
     private fun checkPermissions() {
         if (ActivityCompat.checkSelfPermission(this,
                         android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -338,7 +334,7 @@ class MapsActivity : AppCompatActivity() {
                 try {
                     // Show the dialog by calling startResolutionForResult(),
                     // and check the result in onActivityResult().
-                    e.startResolutionForResult(this@MapsActivity,
+                    e.startResolutionForResult(this@GoogleMapsActivity,
                             REQUEST_CHECK_SETTINGS)
                 } catch (sendEx: IntentSender.SendIntentException) {
                     // Ignore the error.
@@ -396,7 +392,7 @@ class MapsActivity : AppCompatActivity() {
                 }
             }
         } catch (e: IOException) {
-            Log.e("MapsActivity", e.localizedMessage)
+            Log.e("GoogleMapsActivity", e.localizedMessage)
         }
 
         return addressText
