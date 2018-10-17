@@ -1,4 +1,4 @@
-package ru19july.bask.moscowtransport.ui
+package ru19july.bask.moscowtransport.ui.activities
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity

@@ -1,4 +1,4 @@
-package ru19july.bask.moscowtransport.ui
+package ru19july.bask.moscowtransport.ui.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -28,6 +28,7 @@ import org.jetbrains.anko.longToast
 import org.jetbrains.anko.uiThread
 import ru19july.bask.moscowtransport.R
 import ru19july.bask.moscowtransport.interfaces.IMap
+import ru19july.bask.moscowtransport.ui.MyGoogleMap
 import ru19july.bask.moscowtransport.utils.Utils
 import java.io.IOException
 import java.net.URL

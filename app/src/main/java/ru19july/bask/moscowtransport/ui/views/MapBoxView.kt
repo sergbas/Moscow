@@ -1,4 +1,4 @@
-package ru19july.bask.moscowtransport.ui
+package ru19july.bask.moscowtransport.ui.views
 
 import android.content.Context
 import android.os.Bundle
@@ -15,7 +15,7 @@ import ru19july.bask.moscowtransport.interfaces.IMapView
 class MapboxView(applicationContext: Context, app_access_token: String, context: Context?) : View(context), IMapView {
     var mapview : MapView? = null
 
-    override fun getView(): MapView? {
+    override fun getView(): View? {
         return mapview
     }
 
