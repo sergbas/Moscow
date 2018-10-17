@@ -1,4 +1,4 @@
-package ru19july.bask.moscowtransport
+package ru19july.bask.moscowtransport.interfaces
 
 import com.google.android.gms.maps.model.LatLng
 

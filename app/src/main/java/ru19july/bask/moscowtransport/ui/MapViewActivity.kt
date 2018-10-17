@@ -1,9 +1,11 @@
-package ru19july.bask.moscowtransport
+package ru19july.bask.moscowtransport.ui
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.LinearLayout
+import ru19july.bask.moscowtransport.R
+import ru19july.bask.moscowtransport.interfaces.IMapView
 
 class MapViewActivity : AppCompatActivity() {
 

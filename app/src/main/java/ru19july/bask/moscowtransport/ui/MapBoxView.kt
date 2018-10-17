@@ -1,4 +1,4 @@
-package ru19july.bask.moscowtransport
+package ru19july.bask.moscowtransport.ui
 
 import android.content.Context
 import android.os.Bundle
@@ -10,6 +10,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.constants.Style
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
+import ru19july.bask.moscowtransport.interfaces.IMapView
 
 class MapboxView(applicationContext: Context, app_access_token: String, context: Context?) : View(context), IMapView {
     var mapview : MapView? = null
@@ -21,7 +22,10 @@ class MapboxView(applicationContext: Context, app_access_token: String, context:
     init {
         Mapbox.getInstance(applicationContext, app_access_token)
         mapview = MapView(applicationContext)
-        mapview?.setStyleUrl("mapbox://styles/mapbox/satellite-v9")
+        mapview?.setStyleUrl(
+        "mapbox://styles/mapbox/basic-v9"
+//        "mapbox://styles/mapbox/satellite-v9"
+        )
 
         mapview?.setLayoutParams(LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -60,7 +64,7 @@ class MapboxView(applicationContext: Context, app_access_token: String, context:
         mapview?.getMapAsync({
 
             Log.d(javaClass.simpleName, "----- MAP -----")
-            it.setStyle(Style.SATELLITE)
+            it.setStyle(Style.MAPBOX_STREETS)
 
             val destinationCoord = LatLng(latitude, longitude)
             it.animateCamera(CameraUpdateFactory.newLatLngZoom(

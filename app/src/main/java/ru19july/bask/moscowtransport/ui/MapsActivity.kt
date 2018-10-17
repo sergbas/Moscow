@@ -1,4 +1,4 @@
-package ru19july.bask.moscowtransport
+package ru19july.bask.moscowtransport.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -26,6 +26,9 @@ import com.google.gson.Gson
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.uiThread
+import ru19july.bask.moscowtransport.R
+import ru19july.bask.moscowtransport.interfaces.IMap
+import ru19july.bask.moscowtransport.utils.Utils
 import java.io.IOException
 import java.net.URL
 import java.util.*

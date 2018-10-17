@@ -1,4 +1,4 @@
-package ru19july.bask.moscowtransport
+package ru19july.bask.moscowtransport.ui
 
 import android.annotation.SuppressLint
 import android.util.Log

@@ -39,13 +39,13 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".ui.MapsActivity"
             android:label="@string/title_activity_maps"></activity>
-        <activity android:name=".MapBoxActivity">
+        <activity android:name=".ui.MapBoxActivity">
 
         </activity>
-        <activity android:name=".SelectActivity" />
-        <activity android:name=".MapViewActivity">
+        <activity android:name=".ui.SelectActivity" />
+        <activity android:name=".ui.MapViewActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
