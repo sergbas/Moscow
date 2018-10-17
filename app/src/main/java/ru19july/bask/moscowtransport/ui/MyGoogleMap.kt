@@ -6,6 +6,7 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import ru19july.bask.moscowtransport.interfaces.IMap
 
 class MyGoogleMap : IMap, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
