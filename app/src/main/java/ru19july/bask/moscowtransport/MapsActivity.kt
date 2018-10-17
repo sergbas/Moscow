@@ -10,6 +10,7 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.os.StrictMode
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
@@ -68,6 +69,10 @@ class MapsActivity : AppCompatActivity() {
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val policy : StrictMode.ThreadPolicy = StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         if(mapType == 0)
             setContentView(R.layout.activity_maps)
         else {
@@ -141,11 +146,15 @@ class MapsActivity : AppCompatActivity() {
 
         Log.d(javaClass.simpleName, "newPath: " + pathUrl)
 
-        val jsonStr = URL(pathUrl).readText()
-        Log.d(javaClass.simpleName, "PATH: " + jsonStr)
+        try {
+            val jsonStr = URL(pathUrl).readText()
+            Log.d(javaClass.simpleName, "PATH: " + jsonStr)
 
-        val path : PathResult = Gson().fromJson(jsonStr, PathResult::class.java)
+            val path: PathResult = Gson().fromJson(jsonStr, PathResult::class.java)
+        }
+        catch (e: Exception){
 
+        }
         /*
         https://maps.googleapis.com/maps/api/directions/json?origin=55.7217987,37.6386096&destination=55.7209966399032,37.63444882356039&sensor=false&mode=walking&alternatives=true&key=AIzaSyDExP61EUO8OWdW3vpE0xJaCJjyOo50E-A
         * {
